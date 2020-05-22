@@ -4,9 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "gulp dev",
     "build": "gulp build",
-    "deploy": "gulp deploy"
+    "dev": "gulp dev",
+    "deploy": "gulp deploy",
+    "send" : "gulp send"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
@@ -17,14 +18,27 @@
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
     "gulp-bro": "^2.0.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-csso": "^4.0.1",
     "gulp-gh-pages": "^0.5.4",
     "gulp-image": "^6.1.0",
+    "gulp-imagemin": "^7.1.0",
     "gulp-pug": "^4.0.1",
     "gulp-sass": "^4.1.0",
+    "gulp-sass-glob": "^1.1.0",
     "gulp-webserver": "^0.9.1",
+    "gulp.spritesmith-multi": "^3.1.0",
+    "merge-stream": "^2.0.0",
     "node-sass": "^4.14.1",
-    "uglifyify": "^5.0.2"
+    "uglifyify": "^5.0.2",
+    "vinyl-buffer": "^1.0.1"
   },
-  "private": true
+  "autoprefixer": [
+    "> 1%",
+    "last 2 versions",
+    "iOS 10",
+    "Android 2.3",
+    "Firefox ESR",
+    "IE 11"
+  ]
 }
