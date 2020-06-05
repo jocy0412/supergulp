@@ -7,19 +7,22 @@
     "build": "gulp build",
     "dev": "gulp dev",
     "deploy": "gulp deploy",
-    "send" : "gulp send"
+    "send": "gulp send"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "@babel/register": "^7.9.0",
     "babelify": "^10.0.0",
+    "browser-sync": "^2.26.7",
+    "cheerio": "^1.0.0-rc.3",
     "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
     "gulp-bro": "^2.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-csso": "^4.0.1",
+    "gulp-ejs": "^5.1.0",
     "gulp-gh-pages": "^0.5.4",
     "gulp-image": "^6.1.0",
     "gulp-imagemin": "^7.1.0",
@@ -30,6 +33,7 @@
     "gulp.spritesmith-multi": "^3.1.0",
     "merge-stream": "^2.0.0",
     "node-sass": "^4.14.1",
+    "path": "^0.12.7",
     "uglifyify": "^5.0.2",
     "vinyl-buffer": "^1.0.1"
   },

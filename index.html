@@ -51,55 +51,45 @@
 <div class="toc">
     <h2>카테고리 바로가기</h2>
     <ul>
-        
-        <li><a href="#tab00">Title1</a></li>
-        <li><a href="#tab01">뱅크</a></li>
+        <% for (var i=0; i < 100 ; i++){
+        var categoryNum = String("0" + i).slice(-2);
+        var colIndex = 0;
+        var nfileList = nfiles;
+        for(var j=0 ; j < nfileList.length; j++){
+        if (categoryNum == nfileList[j].category){
+        if (colIndex == 0){ %>
+        <li><a href="#tab<%= categoryNum %>"><%= nfileList[j].categoryText %></a></li><%}
+        colIndex++;
+        }
+        }
+        }%>
     </ul>
 </div>
 
-
-<h2 id="tab00" class="sec_h">Title1</h2>
-<ul class="page-lst">
+<%
+var today = new Date();
+today = Date.parse(today);
+for (var i=0; i < 100 ; i++){
+var categoryNum = String("0" + i).slice(-2);
+var listCount = 0;
+var nfileList = nfiles;
+var lastCategory = nfileList[nfileList.length - 1].category;
+for(var j=0 ; j < nfileList.length; j++){
+if (categoryNum == nfileList[j].category){
+if (listCount == 0){ %>
+<h2 id="tab<%= categoryNum %>" class="sec_h"><%= nfileList[j].categoryText %></h2>
+<ul class="page-lst"><%} %>
     <li>
-        <a class="" href="html/00_00_first.html">
-            Test / 00_00_first.html
+        <a class="<%= nfileList[j].status %>" href="html/<%= nfileList[j].name %>">
+            <%= nfileList[j].title %> / <%= nfileList[j].name %>
 
             
 
-            <span class="date" title="2020-5-26 16:44:26 (GMT+9)">최근 수정 날짜(아직 커밋기록 없음) 200526</span>
-        </a> 
-    </li> 
-    <li>
-        <a class="" href="html/00_01_second.html">
-            Test / 00_01_second.html
-
-            
-
-            <span class="date" title="2020-5-26 16:44:26 (GMT+9)">최근 수정 날짜(아직 커밋기록 없음) 200526</span>
-        </a> 
-    </li> 
-    <li>
-        <a class="" href="html/00_02_third.html">
-            Test / 00_02_third.html
-
-            
-
-            <span class="date" title="2020-5-26 16:44:26 (GMT+9)">최근 수정 날짜(아직 커밋기록 없음) 200526</span>
-        </a> 
-    </li> 
-</ul> 
-<h2 id="tab01" class="sec_h">뱅크</h2>
-<ul class="page-lst">
-    <li>
-        <a class="" href="html/01_00_first.html">
-            라인 / 01_00_first.html
-
-            
-
-            <span class="date" title="2020-5-26 16:44:26 (GMT+9)">최근 수정 날짜(아직 커밋기록 없음) 200526</span>
-        </a> 
-    </li> 
-</ul> 
+            <span class="date" title="<%= nfileList[j].ndate %>">최근 수정 날짜(아직 커밋기록 없음) <%= nfileList[j].mdate.substring(2,10).replace(/-/gi,'') %></span>
+        </a> <% if (nfileList[j].splitStatus) { %>
+        <% } %>
+    </li> <% listCount++; } }  if (categoryNum <= lastCategory && listCount >= 1) { %>
+</ul> <%  } } %>
 
 <script>
     var unbindEl = document.querySelectorAll('.yet'),

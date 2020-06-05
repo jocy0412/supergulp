@@ -1,97 +1,106 @@
-import gulp from "gulp";
-import gpug from "gulp-pug";
+import {src, dest, series, parallel, watch, lastRun} from "gulp";
+import fs from 'fs';
+import path from 'path';
+import cheerio from 'cheerio';
 import del from "del";
 import merge from 'merge-stream';
+import gpug from "gulp-pug";
 import vinylBuffer from 'vinyl-buffer';
-import ws from "gulp-webserver";
-// import ejs from 'gulp-ejs';
+import sass from "gulp-sass";
+import sassGlob from "gulp-sass-glob";
+import cleanCss from 'gulp-clean-css';
 import image from "gulp-image";
 import imagemin from "gulp-imagemin";
 import spritesmith from 'gulp.spritesmith-multi';
-import sass from "gulp-sass";
 import autoprefixer from "gulp-autoprefixer";
-import csso from "gulp-csso";
 import bro from "gulp-bro";
+import ejs from 'gulp-ejs';
 import babelify from "babelify";
 import ghPages from "gulp-gh-pages";
-import sassGlob from "gulp-sass-glob";
-import cleanCss from 'gulp-clean-css';
+import ws from "gulp-webserver";
+// import browserSync from 'browser-sync';
 
 sass.compiler = require("node-sass");
 
 const routes = {
     pug: {
+        watch: "./src/**/*.pug",
         src: "./src/*.pug",
-        dest: "./dist",
-        watch: "./src/**/*.pug"
+        dest: "./dist"
     },
     html: {
-        src: "./src/html/**/*",
-        dest: "./dist/html"
+        watch: "./src/html/**/*",
+        src: "./src/html/**/*.html",
+        dest: "./dist/html",
+        webserver: "./dist"
     },
     img: {
-        src: "./src/img/**/*",
+        watch: [
+            "./src/img/**/*",
+            "!./src/img/sprite",
+            "!./src/img/sprite/*.png"
+        ],
         dest: "./dist/img",
         sprite: "./src/img/sprite/*.png"
     },
+    sprite: {
+        src: "./src/img/sprite/*.png",
+        dest: "./dist/img/*.png"
+    },
     scss: {
+        watch: [
+            "./src/scss/**/*.scss",
+            '!./src/scss/vendor/*-mixins.scss'
+        ],
         src: "./src/scss/style.scss",
         dest: "./dist/css",
-        watch: "./src/scss/**/*.scss",
         handlebars: "./src/scss/vendor/spritesmith-mixins.handlebars",
-        vendor : "./src/scss/vendor"
+        vendor: "./src/scss/vendor"
     },
     js: {
-        src: "./src/js/main.js",
-        dest: "./dist/js",
-        watch: "./src/js/**/*.js"
+        watch: "./src/js/**/*.js",
+        src: "./src/js/**/*.js",
+        dest: "./dist/js"
+    },
+    gh: {
+        except: ["./dist/**/*", "!./dist/**/*.map"]
     }
 };
 
 const clean = () => del(["dist/", ".publish"]);
 
 const pug = () =>
-    gulp
-    .src(routes.pug.src)
+    src(routes.pug.src)
     .pipe(gpug())
-    .pipe(gulp.dest(routes.pug.dest));
-
-const html = () =>
-gulp
-.src(routes.html.src)
-.pipe(gulp.dest(routes.html.dest));
-
-const webserver = () =>
-    gulp
-    .src(routes.pug.dest)
-    .pipe(ws({
-        livereload: true,
-        open: true
-    }));
+    .pipe(dest(routes.pug.dest));
 
 const img = () =>
-    gulp
-    .src([
-        routes.img.src,
-        '!./src/img/sprite',
-        '!./src/img/sprite/*.png'
-    ])
+    src(routes.img.watch, {
+        since: lastRun(img)
+    })
     .pipe(image())
-    .pipe(gulp.dest(routes.img.dest));
+    .pipe(dest(routes.img.dest));
 
-const devSassCompile = () =>
-    gulp
-    .src(routes.scss.src, {sourcemaps: true})
+const html = () =>
+    src(routes.html.src)
+    .pipe(ejs())
+    .pipe(dest(routes.html.dest));
+
+const sassCompile = () =>
+    src(routes.scss.src, {
+        sourcemaps: true
+    })
     .pipe(sassGlob())
     .pipe(sass({
         outputStyle: 'compact'
     }).on('error', sass.logError))
-    .pipe(
-        autoprefixer()
-    )
-    .pipe(cleanCss({format: 'keep-breaks'}))
-    // .pipe(csso())
-    .pipe(gulp.dest(routes.scss.dest, {sourcemaps: '.'}));
+    .pipe(autoprefixer())
+    .pipe(cleanCss({
+        format: 'keep-breaks'
+    }))
+    .pipe(dest(routes.scss.dest, {
+        sourcemaps: '.'
+    }));
 
 // const sendSassCompile = () =>
 //     gulp
@@ -110,7 +119,7 @@ const devSassCompile = () =>
 const sprite = () => {
     const opts = {
         spritesmith: function (options, sprite) {
-            options.imgPath = routes.img.dest;
+            options.imgPath = `${routes.img.dest}/${sprite}.png`;
             options.cssName = `_${sprite}-mixins.scss`;
             options.cssTemplate = routes.scss.handlebars;
             options.cssSpritesheetName = sprite;
@@ -119,7 +128,7 @@ const sprite = () => {
             return options
         }
     }
-    const spriteData = gulp.src(routes.img.sprite)
+    const spriteData = src(routes.img.sprite)
         .pipe(spritesmith(opts)).on('error', function (err) {
             console.log(err)
         });
@@ -128,20 +137,19 @@ const sprite = () => {
     const imgStream = spriteData.img
         .pipe(vinylBuffer())
         .pipe(imagemin())
-        .pipe(gulp.dest(routes.img.dest));
+        .pipe(dest(routes.img.dest));
 
     // Pipe CSS stream through CSS optimizer and onto disk
     const cssStream = spriteData.css
         // .pipe(csso())
-        .pipe(gulp.dest(routes.scss.vendor));
+        .pipe(dest(routes.scss.vendor));
 
     // Return a merged stream to handle both `end` events
     return merge(imgStream, cssStream);
 }
 
 const js = () =>
-    gulp
-    .src(routes.js.src)
+    src(routes.js.src)
     .pipe(bro({
         transform: [
             babelify.configure({
@@ -152,26 +160,97 @@ const js = () =>
             }]
         ]
     }))
-    .pipe(gulp.dest(routes.js.dest));
+    .pipe(dest(routes.js.dest));
 
-const gh = () => gulp.src([
-    "./dist/**/*",
-    "!./dist/**/*.map"
-]).pipe(ghPages());
+const makeIndexFile = () => {
+    const dPath = routes.html.dest,  // index를 생성할 파일들이 있는 저장소
+        // info = gitRepoInfo(), // git 정보 생성
+        fileInfo = fs.readdirSync(dPath); // 파일 목록 불러오는 함수를 동기적으로 수정
+    let normalFiles = []; // 파일 정보를 저장할 배열 생성
 
-const watch = () => {
-    gulp.watch(routes.pug.watch, pug);
-    gulp.watch(routes.html.src, html);
-    gulp.watch(routes.img.src, img);
-    gulp.watch(routes.scss.watch, devSassCompile);
-    gulp.watch(routes.js.watch, js);
+    fileInfo.map(function (file) {
+        return path.join(dPath, file);
+    }).filter(function (file) {
+        return fs.statSync(file).isFile();
+    }).forEach(function (file) {
+        let stats = fs.statSync(file);
+        //HTML 파일만 거르기
+        let extname = path.extname(file),
+            basename = path.basename(file);
+        if (extname == '.html') {
+            // 일반 file info를 저장할 객체 생성
+            let nfileData = {};
+            // title 텍스트 값 추출
+            let fileInnerText = fs.readFileSync(file, 'utf8');
+            let $ = cheerio.load(fileInnerText);
+            let wholeTitle = $('title').text(),
+                splitTitle = wholeTitle.split(' : ');
+            // 객체에 데이터 집어넣기
+            nfileData.title = splitTitle[0];
+            nfileData.name = basename;
+            nfileData.category = String(nfileData.name).substring(0, 2);
+            nfileData.categoryText = splitTitle[1];
+            nfileData.mdate = new Date(stats.mtime);
+            // 파일수정시점 - 대한민국 표준시 기준
+            nfileData.ndate = nfileData.mdate.toLocaleString('ko-KR', {
+                timeZone: 'Asia/Seoul'
+            }) + ' (GMT+9)';
+            // title 마지막 조각 , 인덱스에 붙은 라벨 식별 및 yet 인 경우 수정날짜정보 제거
+            nfileData.status = splitTitle[2];
+            if (typeof splitTitle[2] == 'undefined' || splitTitle[2] == null || splitTitle[2] == '') {
+                nfileData.status = '';
+            } else if (splitTitle[2] == 'yet') {
+                nfileData.mdate = '';
+                nfileData.ndate = '';
+            }
+            normalFiles.push(nfileData);
+        }
+    });
+
+    let projectObj = {
+        nfiles: normalFiles
+        // branch: info.branch, // git 사용시
+        // commits: log, // git 사용시
+    }
+    let projectObjStr = JSON.stringify(projectObj);
+    let projectObjJson = JSON.parse(projectObjStr);
+
+    //index 파일 쓰기
+    return src('index.html')
+        .pipe(ejs(projectObjJson))
+        .pipe(dest(routes.html.webserver))
+        // .pipe(browserSync.stream())
+
+}
+
+const webserver = () =>
+    src(routes.html.webserver)
+    .pipe(ws({
+        livereload: true,
+        open: true
+    }));
+
+const gh = () =>
+    src(routes.gh.except)
+    .pipe(ghPages());
+
+const gulpWatch = () => {
+    // watch(routes.pug.watch, pug);
+    watch(routes.html.watch, series(html, makeIndexFile));
+    watch(routes.img.watch, img);
+    watch(routes.sprite.src, series(sprite, sassCompile));
+    watch(routes.scss.watch, sassCompile);
+    watch(routes.js.watch, js);
 };
 
-const prepare = gulp.series(clean, sprite, img);
-const assets = gulp.series(pug, html, devSassCompile, js);
-const live = gulp.parallel(webserver, watch);
+const prepare = series(clean, sprite, img);
+const assets = series(html, sassCompile, js);
+const live = parallel(webserver, makeIndexFile, gulpWatch);
 
-export const build = gulp.series(prepare, assets);
-export const dev = gulp.series(build, live);
-export const deploy = gulp.series(build, gh, clean);
-export const send = gulp.series(sendSassCompile);
+export const build = series(prepare, assets);
+export const dev = series(build, live);
+export const deploy = series(build, gh, clean);
+
+// exports.default = series(build, live);
+
+// export const send = series(sendSassCompile);
