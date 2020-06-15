@@ -4,7 +4,6 @@ import path from 'path';
 import cheerio from 'cheerio';
 import del from "del";
 import merge from 'merge-stream';
-import gpug from "gulp-pug";
 import vinylBuffer from 'vinyl-buffer';
 import sass from "gulp-sass";
 import sassGlob from "gulp-sass-glob";
@@ -18,16 +17,12 @@ import ejs from 'gulp-ejs';
 import babelify from "babelify";
 import ghPages from "gulp-gh-pages";
 import ws from "gulp-webserver";
+import esLint from 'gulp-eslint';
 // import browserSync from 'browser-sync';
 
 sass.compiler = require("node-sass");
 
 const routes = {
-    pug: {
-        watch: "./src/**/*.pug",
-        src: "./src/*.pug",
-        dest: "./dist"
-    },
     html: {
         watch: "./src/html/**/*",
         src: "./src/html/**/*.html",
@@ -68,11 +63,6 @@ const routes = {
 };
 
 const clean = () => del(["dist/", ".publish"]);
-
-const pug = () =>
-    src(routes.pug.src)
-    .pipe(gpug())
-    .pipe(dest(routes.pug.dest));
 
 const img = () =>
     src(routes.img.watch, {
@@ -146,6 +136,15 @@ const sprite = () => {
 
     // Return a merged stream to handle both `end` events
     return merge(imgStream, cssStream);
+}
+
+const eslint = (done) => {
+    src(routes.js.src)
+    .pipe(esLint())
+    .pipe(esLint.format())
+    .pipe(esLint.failAfterError());
+
+    done();
 }
 
 const js = () =>
@@ -240,11 +239,11 @@ const gulpWatch = () => {
     watch(routes.img.watch, img);
     watch(routes.sprite.src, series(sprite, sassCompile));
     watch(routes.scss.watch, sassCompile);
-    watch(routes.js.watch, js);
+    watch(routes.js.watch, series(eslint, js));
 };
 
 const prepare = series(clean, sprite, img);
-const assets = series(html, sassCompile, js);
+const assets = series(html, sassCompile, eslint, js);
 const live = parallel(webserver, makeIndexFile, gulpWatch);
 
 export const build = series(prepare, assets);
