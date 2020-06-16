@@ -1,0 +1,35 @@
+/* MAIN */
+
+.sp{
+	display: inline-block;
+}
+
+.btn_back{
+	padding: 10px;
+	font-size: 0;
+	.sp_back {
+		@include use-sprite('ico_back_black');	
+	}
+}
+
+
+.breakpoint{
+	@include position(absolute, 55px, 20px, false, false);
+	width: 545px;
+	height: 1px;
+	background: rgba(0,0,0,.3);
+	content: '';
+	@include breakpoint(maximum) {
+		width: 324px;
+	};
+}
+
+.transition{
+	-webkit-transition: all .1s ease-out;
+	-ms-transition: all .1s ease-out;
+	transition: all .1s ease-out;
+}
+
+.font_include {
+	@include fonts(13, 24px, 700);
+}

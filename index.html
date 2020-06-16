@@ -17,7 +17,7 @@
         h2,h3{clear:both;font-size:1em}
         h2{padding:2em .1em .4em;border-bottom:1px solid #000}
         h3{padding:1em .1em .4em;border-bottom:1px dotted #888}
-        .inf{padding:10px 2px 0;line-height:1.4em;color:#666}
+        .inf{margin-bottom:30px;padding:10px 2px 0;line-height:1.4em;font-size:18px;font-weight:700;color:#666}
         ul{margin-bottom:10px;font-size:.9em}
         li{border-bottom:1px solid #dfdfdf}
         li .na{display:block;padding:.7em 31px .6em .1em;color:#999}
@@ -46,7 +46,7 @@
 </head>
 <body>
 
-<p class="inf">Test Index File</p>
+<p class="inf">아이엠스쿨 모바일 UIO 가이드</p>
 
 <div class="toc">
     <h2>카테고리 바로가기</h2>
@@ -84,8 +84,8 @@ if (listCount == 0){ %>
             <%= nfileList[j].title %> / <%= nfileList[j].name %>
 
             
-
-            <span class="date" title="<%= nfileList[j].ndate %>">최근 수정 날짜(아직 커밋기록 없음) <%= nfileList[j].mdate.substring(2,10).replace(/-/gi,'') %></span>
+            <!-- [D] 수정 커밋 날짜 활용시 .date의 display:none 제거 -->
+            <span class="date" title="<%= nfileList[j].ndate %>" style="display: none;">최근 수정 날짜(아직 커밋기록 없음) <%= nfileList[j].mdate.substring(2,10).replace(/-/gi,'') %></span>
         </a> <% if (nfileList[j].splitStatus) { %>
         <% } %>
     </li> <% listCount++; } }  if (categoryNum <= lastCategory && listCount >= 1) { %>

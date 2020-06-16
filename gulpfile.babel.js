@@ -29,40 +29,73 @@ const routes = {
         dest: "./dist/html",
         webserver: "./dist"
     },
+    font: {
+        src: "./src/font",
+        dest: "./dist/font"
+    },
     img: {
         watch: [
             "./src/img/**/*",
             "!./src/img/sprite",
             "!./src/img/sprite/*.png"
         ],
-        dest: "./dist/img",
-        sprite: "./src/img/sprite/*.png"
+        dest: "./dist/img"
     },
     sprite: {
         src: "./src/img/sprite/*.png",
-        dest: "./dist/img/*.png"
+        path: "../img"
     },
     scss: {
         watch: [
-            "./src/scss/**/*.scss",
-            '!./src/scss/vendor/*-mixins.scss'
+            "./src/css/scss/**/**/*.scss",
+            '!./src/css/scss/vendor/*-mixins.scss'
         ],
-        src: "./src/scss/style.scss",
-        dest: "./dist/css",
-        handlebars: "./src/scss/vendor/spritesmith-mixins.handlebars",
-        vendor: "./src/scss/vendor"
+        src: {
+            root: "./src/css/scss/common.scss",
+            libs: "./src/css/libs/*.css"
+        },
+        handlebars: "./src/css/scss/vendor/spritesmith-mixins.handlebars",
+        vendor: "./src/css/scss/vendor",
+        dest : {
+            root: "./dist/css",
+            libs: "./dist/css/libs",
+            del: [
+                "./dist/css/*.css",
+                "./dist/css/*.map"
+            ]
+        }
     },
     js: {
-        watch: "./src/js/**/*.js",
-        src: "./src/js/**/*.js",
-        dest: "./dist/js"
+        src : {
+            root: [
+                "./src/js/**/*.js",
+                "!./src/js/libs/*.js"
+            ],
+            libs: "./src/js/libs/*.js"
+        },
+        dest: {
+            root: "./dist/js",
+            libs: "./dist/js/libs",
+            del : "/dist/js/*.js"
+        }
     },
     gh: {
         except: ["./dist/**/*", "!./dist/**/*.map"]
     }
 };
 
-const clean = () => del(["dist/", ".publish"]);
+// clean function
+const distClean = () => del(["dist/", ".publish"]);
+const cssLibsClean = () => del(routes.scss.dest.libs);
+const jsLibsClean = () => del(routes.js.dest.libs);
+export const cssClean = () => del(routes.scss.dest.del);
+const jsClean = () => del(routes.js.dest.del);
+
+
+const html = () =>
+    src(routes.html.src)
+    .pipe(ejs())
+    .pipe(dest(routes.html.dest));
 
 const img = () =>
     src(routes.img.watch, {
@@ -71,45 +104,14 @@ const img = () =>
     .pipe(image())
     .pipe(dest(routes.img.dest));
 
-const html = () =>
-    src(routes.html.src)
-    .pipe(ejs())
-    .pipe(dest(routes.html.dest));
-
-const sassCompile = () =>
-    src(routes.scss.src, {
-        sourcemaps: true
-    })
-    .pipe(sassGlob())
-    .pipe(sass({
-        outputStyle: 'compact'
-    }).on('error', sass.logError))
-    .pipe(autoprefixer())
-    .pipe(cleanCss({
-        format: 'keep-breaks'
-    }))
-    .pipe(dest(routes.scss.dest, {
-        sourcemaps: '.'
-    }));
-
-// const sendSassCompile = () =>
-//     gulp
-//     .src(routes.scss.src)
-//     .pipe(sassGlob())
-//     .pipe(sass({
-//         outputStyle: 'compact'
-//     }).on('error', sass.logError))
-//     .pipe(
-//         autoprefixer()
-//     )
-//     .pipe(cleanCss({format: 'keep-breaks'}))
-//     // .pipe(csso())
-//     .pipe(gulp.dest(routes.scss.dest));
+const font = () =>
+    src(routes.font.src)
+    .pipe(dest(routes.font.dest));
 
 const sprite = () => {
     const opts = {
         spritesmith: function (options, sprite) {
-            options.imgPath = `${routes.img.dest}/${sprite}.png`;
+            options.imgPath = `${routes.sprite.path}/${sprite}.png`;
             options.cssName = `_${sprite}-mixins.scss`;
             options.cssTemplate = routes.scss.handlebars;
             options.cssSpritesheetName = sprite;
@@ -118,7 +120,7 @@ const sprite = () => {
             return options
         }
     }
-    const spriteData = src(routes.img.sprite)
+    const spriteData = src(routes.sprite.src)
         .pipe(spritesmith(opts)).on('error', function (err) {
             console.log(err)
         });
@@ -138,8 +140,28 @@ const sprite = () => {
     return merge(imgStream, cssStream);
 }
 
+const sassCompile = () =>
+    src(routes.scss.src.root, {
+        sourcemaps: true
+    })
+    .pipe(sassGlob())
+    .pipe(sass({
+        outputStyle: 'compact'
+    }).on('error', sass.logError))
+    .pipe(autoprefixer())
+    .pipe(cleanCss({
+        format: 'keep-breaks'
+    }))
+    .pipe(dest(routes.scss.dest.root, {
+        sourcemaps: '.'
+    }));
+
+const destCssLibs = () =>
+    src(routes.scss.src.libs)
+    .pipe(dest(routes.scss.dest.libs));
+    
 const eslint = (done) => {
-    src(routes.js.src)
+    src(routes.js.src.root)
     .pipe(esLint())
     .pipe(esLint.format())
     .pipe(esLint.failAfterError());
@@ -148,7 +170,7 @@ const eslint = (done) => {
 }
 
 const js = () =>
-    src(routes.js.src)
+    src(routes.js.src.root)
     .pipe(bro({
         transform: [
             babelify.configure({
@@ -159,7 +181,11 @@ const js = () =>
             }]
         ]
     }))
-    .pipe(dest(routes.js.dest));
+    .pipe(dest(routes.js.dest.root));
+
+const destJsLibs = () =>
+    src(routes.js.src.libs)
+    .pipe(dest(routes.js.dest.libs));
 
 const makeIndexFile = () => {
     const dPath = routes.html.dest,  // index를 생성할 파일들이 있는 저장소
@@ -234,22 +260,20 @@ const gh = () =>
     .pipe(ghPages());
 
 const gulpWatch = () => {
-    // watch(routes.pug.watch, pug);
+    watch(routes.scss.src.libs, series(cssLibsClean, destCssLibs));
+    watch(routes.js.src.libs, series(jsLibsClean, destJsLibs));    
     watch(routes.html.watch, series(html, makeIndexFile));
     watch(routes.img.watch, img);
     watch(routes.sprite.src, series(sprite, sassCompile));
-    watch(routes.scss.watch, sassCompile);
-    watch(routes.js.watch, series(eslint, js));
+    watch(routes.scss.watch, series(cssClean, sassCompile));
+    watch(routes.js.src.root, series(jsClean, eslint, js));
 };
 
-const prepare = series(clean, sprite, img);
-const assets = series(html, sassCompile, eslint, js);
+const prepare = series(distClean, sprite, img);
+const destLibs = parallel(destCssLibs, destJsLibs);
+const assets = series(font, html, sassCompile, eslint, js);
 const live = parallel(webserver, makeIndexFile, gulpWatch);
 
-export const build = series(prepare, assets);
+export const build = series(prepare, destLibs, assets);
 export const dev = series(build, live);
-export const deploy = series(build, gh, clean);
-
-// exports.default = series(build, live);
-
-// export const send = series(sendSassCompile);
+export const deploy = series(build, gh, distClean);

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>UI 가이드 :: 아이엠스쿨 모바일</title>
+<link rel="stylesheet" href="../css/common.css">
+<link rel="stylesheet" href="../css/libs/prism.css">
+<style>
+	.header, .bx_floating{position:relative}
+	.tbl_select li{background-color:#fff}
+</style>
+<script type="text/javascript" src="../js/libs/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="../js/libs/ui_test.js"></script>
+<script type="text/javascript" src="../js/libs/x-rayHTML.js"></script>
+<script type="text/javascript" src="../js/libs/prism.min.js"></script>
+<script type="text/javascript">
+$( window ).bind( "create.xrayhtml", function( e ) {
+	//console.log("working");
+	var prism = !!~e.target.getAttribute( "class" ).indexOf( "prism" );
+
+	if( prism && "Prism" in window ) {
+		$( ".prism" ).find( "code" ).addClass( "language-markup" );
+			Prism.highlightAll();
+	}
+});
+$(function(){
+	$(".source-panel").each(function(){
+		$(this).append("<a href='#' class='btn_view'>View Source ▼</a>");
+		$(this).children('pre').hide();
+	});
+
+	$(".source-panel .btn_view").on("click",function(){
+		$(this).parent().children('pre').toggle();
+		return false;
+	});
+});
+</script>
+<!-- [D] template용 스타일 -->
+<style>
+body{padding:0 0 80px;background-color:#f4f4f4;font-size:14px}
+.guide_wrap{max-width:1000px;min-width:360px;margin:0 auto;padding:50px 0}
+.tit_sec{display:block;margin-bottom:10px;font-weight:bold;font-size:21px;color:#00ce53}
+.guide_tit{background:#00ce53;font-weight:600;font-size:15px;color:#fff;line-height:30px;text-indent:8px}
+.guide_stit{position:relative;margin-bottom:10px;padding-left:10px;border-left:3px solid #ff7463;font-size:15px;line-height:18px}
+.guide_stit .stxt{display:inline-block;margin-left:10px;font-size:13px;color:#10bcd0;font-weight:normal;vertical-align:middle}
+.guide_desc{margin-bottom:15px;padding-left:15px;font-size:14px;font-weight:700}
+.source{position:relative;margin-bottom:50px}
+.source-panel{position:relative;margin-top:15px;min-height:20px;font-size:12px;letter-spacing:0}
+.source-panel .btn_view{position:absolute;top:0;right:0;left:0;background:#e3e2e3;font-family:Consolas, Monaco, 'Andale Mono', monospace;font-size:12px;line-height:20px;color:#ff7463;letter-spacing:-0.05em;text-decoration:none;text-indent:8px}
+.tooltip_area{z-index:100}
+.title_sec + .sub_tit_sec_v1{top:0}
+</style>
+<!-- //[D] template용 스타일 -->
+</head>
+
+<body>
+<h1 class="guide_tit">NHN EDU 모바일 가이드</h1>
+
+<div class="guide_wrap">
+	<span class="tit_sec">1. 헤더</span>
+
+	<h2 class="guide_stit">모바일 헤더 type1<span class="stxt">- 햄버거 메뉴 버튼 / 타이틀 텍스트 좌측 정렬 / 우측 취소하기 버튼 타입1</span></h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<div class="header">
+			<a href="#" class="btn_menu"><span class="sp ico_ham">메뉴 열기</span></a>
+			<strong class="tit_txt">타이틀 텍스트</strong>
+			<!-- [D] 아이콘 버튼 헤더 우측에 있을 경우 .right 추가 -->
+			<a href="#" class="btn_menu right"><span class="sp ico_close">취소하기</span></a>
+		</div>
+	</div>
+	
+	<h2 class="guide_stit">모바일 헤더 type2<span class="stxt">- 뒤로가기 버튼 / 타이틀 텍스트 가운데 정렬 / 우측 취소하기 버튼 타입2</span></h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<div class="header">
+			<a href="#" class="btn_menu"><span class="sp ico_back">뒤로가기</span></a>
+			<!-- [D] 고정된 타이틀 텍스트를 사용 하는 영역 타이틀 가운데 정렬시 .al_center 추가 -->
+			<strong class="tit_txt al_center">타이틀 텍스트</strong>
+			<!-- [D] 아이콘 버튼 헤더 우측에 있을 경우 .right 추가 -->
+			<a href="#" class="btn_menu right"><span class="sp ico_cancel">취소하기</span></a>
+		</div>
+	</div>
+
+	<h2 class="guide_stit">모바일 헤더 type3<span class="stxt">- 인풋에 텍스트 입력 시 / 우측 텍스트 버튼</span></h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<div class="header">
+			<a href="#" class="btn_menu"><span class="sp ico_back">뒤로가기</span></a>
+			<!-- [D] 텍스트 입력시에 사용되는 input -->
+			<input type="txt" name="" class="inp_txt" placeholder="텍스트 입력 인풋">
+			<!-- [D] 헤더 우측 텍스트 버튼 -->
+			<button class="btn_txt">나가기</button>
+		</div>
+	</div>
+
+	<span class="tit_sec">2. 하단 플로팅 버튼</span>
+	<h2 class="guide_stit">화면 하단의 플로팅 버튼<span class="stxt">- .bx_floating 태그가 .bx_btn의 위치를 하단으로 플로팅</span></h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<!-- [D] .bx_floating이 화면 하단의 플로팅 배치됨 -->
+		<div class="bx_floating">
+			<ul class="bx_btn">
+			<li><button type="button" class="btn btn_gray">초기화</button></li>
+			<li><button type="button" class="btn btn_ok">완료</button></li>
+			</ul>
+		</div>
+	</div>
+
+	<h2 class="guide_stit">2개의 버튼의 크기가 다를 때<span class="stxt">- .bx_btn에 .type2 추가</span></h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<!-- [D] .bx_floating이 화면 하단의 플로팅 배치됨 -->
+		<div class="bx_floating">
+			<!-- [D] 왼쪽 버튼의 크기가 작을 때 bx_btn에 type2 추가 -->
+			<ul class="bx_btn type2">
+			<li><button type="button" class="btn btn_gray">초기화</button></li>
+			<li><button type="button" class="btn btn_ok">완료</button></li>
+			</ul>
+		</div>
+	</div>
+		
+	<span class="tit_sec">3. Input</span>
+	<h2 class="guide_stit">Checkbox / Radio 버튼</h2>
+	<div data-xrayhtml="prism" class="source prism">
+		<ul>
+		<li>
+			<span class="bx_input_rdo">
+				<input type="radio" class="input_rdo" id="input_rdo1" name="inp_rdo" checked>
+				<label for="input_rdo1" class="input_lbl">라디오 설명문구</label>
+			</span>
+			<span class="bx_input_rdo">
+				<input type="radio" class="input_rdo" id="input_rdo2" name="inp_rdo">
+				<label for="input_rdo2" class="input_lbl">라디오 설명문구</label>
+			</span>
+		</li>
+		<li>
+			<span class="bx_input_chk">
+				<input type="checkbox" class="input_chk" id="input_chk1" checked>
+				<label for="input_chk1" class="input_lbl">기본 설명문구</label>
+			</span>
+			<span class="bx_input_chk">
+				<input type="checkbox" class="input_chk" id="input_chk2">
+				<label for="input_chk2" class="input_lbl">기본 설명문구</label>
+			</span>
+		</li>
+		</ul>	
+	</div>
+
+	<!-- [D] 마크업 확인용, 개발 시 제거 필요 -->
+	<style>
+		.header.white{background-color:#00ceb3}
+		.case_review{position:fixed;bottom:0px;right:0px;padding:12px 10px;background:rgba(0,0,0,.5);z-index:200;font-size:12px;color:#fff;line-height:14px}
+		.case_review a{display:block;padding:5px 0;font-size:12px;color:#fff}
+	</style>
+	<div class="case_review">
+		<a href="#" onclick="$('.header').toggleClass('white');return false">1. 헤더의 아이콘이 흰색일 경우 .header에 .white 추가</a>
+	</div>
+	<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+	<script>
+		$(function(){
+			// [D] 테이블 선택시 활성화
+			$('.tbl_select li, .bx_btn_right .btn').click(function(){
+				$(this).toggleClass('on');
+			});
+
+			// [D] bx_placeholder 클릭시 .inp_txt에 focus
+			$('.bx_placeholder').click(function(){
+				$(this).hide();
+				$(this).prev('.inp_txt').focus();
+			});
+
+			$('.inp_txt').blur(function(){
+				$('.bx_placeholder').show();
+			});
+
+		});
+
+	</script>
+	<!-- //[D] 마크업 확인용, 개발 시 제거 필요 -->
+
+</div>
+</body>
+</html>

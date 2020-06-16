@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <%- include('includes/head.ejs', {
+        title: "<title>아이엠스쿨 : 서비스</title>",
+    })%>
+<body>
+    <div id="wrap" class="wrap btn_exist">
+        <div class="header">
+            <!-- [D] 헤더 좌측 버튼모음 -->
+            <a href="#" class="btn_menu"><span class="sp ico_ham">메뉴 열기</span></a>
+            <a href="#" class="btn_menu" style="display:none"><span class="sp ico_back">뒤로가기</span></a>
+            <!-- //[D] 헤더 좌측 버튼모음 -->
+    
+            <!-- [D] 고정된 타이틀 텍스트를 사용 하는 영역 타이틀 가운데 정렬시 .al_center 추가 -->
+            <strong class="tit_txt">타이틀 텍스트</strong>
+    
+            <!-- [D] 텍스트 입력시에 사용되는 input -->
+            <input type="txt" name="" class="inp_txt" placeholder="텍스트 입력 인풋" style="display:none">
+            <!-- [D] placeholder의 텍스트 앞에 아이콘이 추가되는 경우 사용 .bx_placeholder 클릭시 .inp_txt에 포커스 -->
+            <div class="bx_placeholder" style="display:none">
+                <span class="sp ico_srch"></span><span class="inp_placeholder">찾고 싶은 시설을 검색하세요</span>
+            </div>
+    
+            <!-- [D] 헤더 우측 버튼 모음 -->
+    
+            <!-- [D] 아이콘 버튼, 버튼이 우측에 있을 경우 .right 추가 -->
+            <a href="#" class="btn_menu right"><span class="sp ico_close">취소하기</span></a>
+            <a href="#" class="btn_menu right" style="display:none"><span class="sp ico_cancel">취소하기</span></a>
+            
+            <!-- [D] 헤더 우측 텍스트 버튼 -->
+            <button class="btn_txt" style="display:none">나가기</button>
+    
+        </div>
+        
+        <div class="header web_view" style="display:none">
+            <h1 class="logo"><a href="#" class="ico">iamSchool</a></h1>
+            <a href="#" class="btn_start"><span class="txt">아이엠스쿨 시작하기</span></a>
+        </div>
+        <!-- [D] CONTENTS -->
+        <div id="content" class="content">
+            <p style="padding:10px 0;background-color:#ff0;font-weight:700;text-align:center">컨텐츠 영역</p>
+        </div>
+    
+        <!-- [D] 하단 플로팅 버튼 영역 -->
+        <div class="bx_floating">
+            <ul class="bx_btn">
+            <li><button type="button" class="btn btn_gray">초기화</button></li>
+            <li><button type="button" class="btn btn_ok">완료</button></li>
+            </ul>
+        </div>
+        <!-- //[D] 하단 플로팅 버튼 영역 -->
+    
+        <!-- [D] 마크업 확인용, 개발 시 제거 필요 -->
+        <style>
+            .case_review{position:fixed;bottom:0px;right:0px;padding:8px 10px;background:rgba(0,0,0,.5);z-index:200;font-size:12px;color:#fff;line-height:14px}
+            .case_review a{display:block;padding:4px 0;font-size:12px;color:#fff}
+        </style>
+        <div class="case_review">
+            <a href="#" onclick="$('.header').toggle();return false">[화면] (헤더) 웹뷰 / 모바일 버전</a>
+            <a href="#" onclick="$('.btn_menu:eq(0),.btn_menu:eq(1)').toggle();return false">[화면] (헤더 왼쪽) 햄버거 / 뒤로가기 버튼</a>
+            <a href="#" onclick="$('.btn_menu:eq(2),.btn_menu:eq(3)').toggle();$('.btn_txt').hide();return false">[화면] (헤더 오른쪽) 취소버튼 (2가지type)</a>
+            <a href="#" onclick="$('.btn_txt').show();$('.btn_menu:eq(2),.btn_menu:eq(3),.bx_btn_right').hide();return false">[화면] (헤더 오른쪽) 텍스트버튼</a>
+            <a href="#" onclick="$('.tit_txt').toggleClass('al_center');return false">[화면] 타이틀 텍스트 가운데 정렬(on/off)</a>
+            <a href="#" onclick="$('.tit_txt, .inp_txt').toggle();return false">[화면] 타이틀 텍스트 고정 / 텍스트 입력 인풋</a>
+            <a href="#" onclick="$('.wrap').toggleClass('btn_exist');$('.bx_floating').toggle();return false">[화면] 하단 플로팅 버튼</a>
+        </div>
+        <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('.bx_btn_right .btn').click(function(){
+                    $(this).toggleClass('on');
+                });	
+            });
+        </script>
+        <!-- [D] //마크업 확인용, 개발 시 제거 필요 -->
+    </div>
+</body>
+</html>

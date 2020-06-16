@@ -1,0 +1,129 @@
+// SCSS setting
+$root-em: 10;
+
+// Font Setting
+// 1. font-size, line-height, font-weight 지정
+// 2. line-height는 font-size 대비 em으로 계산합니다. 하지만 line-height를 px 단위로 지정하면 em 으로 계산하지 않고 px로 반환됩니다.
+// 3. line-height, font-weight는 생략 가능
+// (참고) @include fonts(14,18,300); or @include fonts(14,18px,"normal");
+
+@mixin fonts($size: $initial-font-size, $lineHeight: false, $bold: false) {
+	@if unitless($size) {
+		// @warn "Assuming #{$size} to be in pixels";
+		$size: 1px * $size;
+	}
+	font-size: $size;
+	$lhr: 0;
+	@if $lineHeight {
+		@if unitless($lineHeight) {
+		// @warn "Assuming #{$size} to be in pixels";
+		$lineHeight: 1px * $lineHeight;
+		$lh: round($lineHeight / $size * 100) / 100;
+		$lhr: $lh * 1em;
+		}
+		@else {
+		$lhr: $lineHeight;
+		}
+		line-height: $lhr;
+	}
+	@if $bold {
+		font-weight: setFontWeight($bold);
+	}
+}
+
+@function setRem($size) {
+  // $pow: pow(10, 2);
+  $remSize: round($size / $root-em * 100) / 100;
+  @return $remSize * 1rem;
+}
+
+@function setFontWeight($bold) {
+	@if $bold=="thin" {
+		@return 100;
+	}
+	@else if $bold=="light" {
+		@return 300;
+	}
+	@else if $bold=="normal" {
+		@return 400;
+	}
+	@else if $bold=="bold" {
+		@return 700;
+	}
+	@else {
+		@return $bold;
+	}
+}
+
+// BreakPoint
+@mixin breakpoint($point) {
+	@if $point==minimum {
+		@media screen and (max-width: $screen-sm) {
+			@content;
+		}
+	}
+	@else if $point==maximum {
+		@media screen and (max-width: $screen-md) {
+			@content;
+		}
+	}
+	@else if $point==ultra {
+		@media screen and (min-width: $screen-lg) {
+			@content;
+		}
+	}
+}
+
+// Position
+@mixin position($position, $top: false, $right: false, $bottom: false, $left: false) {
+	position: $position;
+	@if $top {
+		top: $top;
+	}
+	@if $right {
+		right: $right;
+	}
+	@if $bottom {
+		bottom: $bottom;
+	}
+	@if $left {
+		left: $left;
+	}
+}
+
+// Clearfix
+@mixin clearfix {
+	&:before,
+	&:after {
+		content: '';
+		display: block;
+		clear: both;
+	}
+}
+
+// Blind
+%visuallyhidden {
+	margin: -1px !important;
+	padding: 0 !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	position: absolute;
+}
+
+// Ellipsis (1줄 말줄임)
+@mixin ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+// Multi Ellipsis (only.webkit)
+@mixin multi-ellipsis($line) {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-line-clamp: $line;
+	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+}

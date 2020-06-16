@@ -1,0 +1,102 @@
+$sprite-vars: (
+	'ico_back_black': (
+		offset-x: 0px / 2,
+		offset-y: 0px / 2,
+		width: 60px / 2,
+		height: 60px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_back_white': (
+		offset-x: -64px / 2,
+		offset-y: 0px / 2,
+		width: 60px / 2,
+		height: 60px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_cancel': (
+		offset-x: 0px / 2,
+		offset-y: -64px / 2,
+		width: 60px / 2,
+		height: 60px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_close_black': (
+		offset-x: -64px / 2,
+		offset-y: -64px / 2,
+		width: 60px / 2,
+		height: 60px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_close_white': (
+		offset-x: -128px / 2,
+		offset-y: 0px / 2,
+		width: 60px / 2,
+		height: 60px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_ham_black': (
+		offset-x: -38px / 2,
+		offset-y: -128px / 2,
+		width: 34px / 2,
+		height: 23px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_ham_white': (
+		offset-x: 0px / 2,
+		offset-y: -128px / 2,
+		width: 34px / 2,
+		height: 24px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+	'ico_search': (
+		offset-x: -128px / 2,
+		offset-y: -64px / 2,
+		width: 34px / 2,
+		height: 34px / 2,
+		total-width: 188px / 2,
+		total-height: 152px / 2,
+		imageSrc: '../img/sprite.png'
+	),
+);
+$sprite-origin: (
+  total-width: 188px / 2,
+  total-height: 152px / 2,
+  imageSrc: '../img/sprite.png'
+);
+
+@mixin sprite-size($image) {
+	background-size: map-get($image, 'total-width') map-get($image, 'total-height');
+}
+
+@mixin sprite-image($image) {
+	$image-path: map-get($image, 'imageSrc');
+	background-image: url($image-path);
+}
+
+@mixin set-sprite {
+  @include sprite-size($sprite-origin);
+  @include sprite-image($sprite-origin);
+}
+
+@mixin use-sprite($image, $size: true) {
+  @include set-sprite;
+	background-position: map-get(map-get($sprite-vars, $image), 'offset-x') map-get(map-get($sprite-vars, $image), 'offset-y');
+	@if $size {
+		width: map-get(map-get($sprite-vars, $image), 'width');
+		height: map-get(map-get($sprite-vars, $image), 'height');
+	}
+}
